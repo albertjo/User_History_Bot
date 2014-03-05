@@ -1,9 +1,8 @@
 import praw
 
 class User:
-	def __init__(self, username):
-		self.user_agent = ("Reddit History Statistics")
-		self.r = praw.Reddit(user_agent = self.user_agent)
+	def __init__(self, username, r):
+		self.r = r 
 		self.user = (self.r).get_redditor(username)
 
 		self.username = username
