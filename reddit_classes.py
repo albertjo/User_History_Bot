@@ -1,5 +1,7 @@
 import praw
 
+MAX_SUBS = 80
+
 class User:
         def __init__(self, username, r):
                 self.r = r 
@@ -58,13 +60,22 @@ class User:
 
 
         def get_comment_statistics(self):
-                str_message = "Total Comments: {}\n\n{:20}|{:20}|{:20}\n".format( self.get_number_of_comments(), "Subreddit", "Posts" ,"percentage")
+                str_message = "Data for the last {} comments (MAX 1000)\n\n{:20}|{:20}|{:20}\n".format(
+                        self.get_number_of_comments(), "Subreddit", "Posts" ,"percentage")
                 str_message += (("-"*20 + "|")*2 + "-"*20)+"\n"
                 comment_dict = self.get_comments().get_posts()
-                for subreddit in comment_dict:
+                local_c = 0
+
+                for subreddit in sorted(comment_dict, key=lambda k: len(comment_dict[k]), reverse=True): 
                         num_posts = len(comment_dict[subreddit])
                         percentage = "{0:.2f}%".format(100 * num_posts/self.get_number_of_comments())
-                        str_message += "{:20}|{:20}|{:20}\n".format(subreddit, num_posts, percentage)   
+                        str_message += "{:20}|{:20}|{:20}\n".format(subreddit, num_posts, percentage)
+                        local_c+=1
+                        if local_c == MAX_SUBS:
+                            break
+
+                str_message+="\n\nWant to remove this post? Send a message with the link to this post to /u/fuck_these_bots."
+                print("comment statistics successful")
                 return str_message
 
 

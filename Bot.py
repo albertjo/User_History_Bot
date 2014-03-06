@@ -21,22 +21,18 @@ def parse_comment_text(text):
 
 def process_message(username, special):
 	if not (username is None):
-		user = User(username, REDDIT_INTERFACE)
-		if not (special is None):
-			if (special == "submitted"):
-				user.process_submitted()
-			elif (special == "comments"):
-				user.process_comments()
-			else:
-				user.process_comments()
-				user.process_submitted()
-		else:
-			print("HERE")
+		try: 
+			user = User(username, REDDIT_INTERFACE)
 			user.process_comments()
 			comment_statistics = user.get_comment_statistics()
+			print("comment statistics successfuly retrieved")
 			return comment_statistics
-			#user.process_submitted()
-	return ""
+		
+		except: 
+			print("remeber to log error that comment failed")
+			return "I'm a bot that just gets simple statistics about your comment history. Don't hurt me."
+	print("Username is none")	
+	return None
 
 
 
@@ -44,7 +40,13 @@ def process_message(username, special):
 # parse a message string and do appropriate
 def launch_response(message):
 	username, special = parse_comment_text(message.body)
-	message.reply(process_message(username, special))
+	reply_object = process_message(username, special)
+	if not (reply_object is None):
+		try:
+			message.reply(reply_object)
+		except:
+			print(reply_object)
+			#log error
 	message.mark_as_read()
 
 def main():
@@ -56,6 +58,7 @@ def main():
 				launch_response(message)
 		except KeyboardInterrupt:
 			running = False
+		time.sleep(10)
 
 
 if __name__ == '__main__':
