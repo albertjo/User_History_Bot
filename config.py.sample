@@ -1,0 +1,7 @@
+config = {
+
+	'user-agent' = "",
+	'reddit_username' = "",
+	'reddit_password'=""
+
+}
