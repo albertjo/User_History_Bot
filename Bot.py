@@ -29,7 +29,7 @@ def process_message(username, special):
 			return comment_statistics
 		
 		except: 
-			print("remeber to log error that comment failed")
+			print("remember to log error that comment failed")
 			return "I'm a bot that just gets simple statistics about your comment history. Don't hurt me."
 	print("Username is none")	
 	return None
