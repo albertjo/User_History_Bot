@@ -47,7 +47,6 @@ class User:
         def get_submitted_by_subreddit(self, subreddit):
                 return (self.submitted).get_subreddit_posts(subreddit)
 
-        #
         def process_comments(self):
                 comment_iter = (self.user).get_comments(limit=None)
                 for comment in comment_iter:
@@ -61,7 +60,7 @@ class User:
 
         def get_comment_statistics(self):
                 str_message = "Data for the last {} comments (MAX 1000)\n\n{:20}|{:20}|{:20}\n".format(
-                        self.get_number_of_comments(), "Subreddit", "Posts" ,"percentage")
+                        self.get_number_of_comments(), "Subreddit", "Posts" ,"Percentage")
                 str_message += (("-"*20 + "|")*2 + "-"*20)+"\n"
                 comment_dict = self.get_comments().get_posts()
                 local_c = 0
@@ -75,7 +74,6 @@ class User:
                             break
 
                 str_message+="\n\nWant to remove this post? Send a message with the link to this post to /u/fuck_these_bots."
-                print("comment statistics successful")
                 return str_message
 
 
