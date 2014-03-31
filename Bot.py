@@ -2,12 +2,16 @@ import praw
 import time
 from reddit_classes import User
 from config import config
+from random import randrange
 
 REDDIT_INTERFACE = None
 USER_AGENT = config['user_agent'] 
 REDDIT_USERNAME = config['reddit_username']
 REDDIT_PASSWORD = config['reddit_password']
 BAN_MESSAGE = "User_History_Bot has been banned from this subreddit"
+
+RANDOM_MESSAGE_1 = config['random_message_1']
+RANDOM_MESSAGE_2 = config['random_message_2']
 
 #
 def parse_comment_text(text):
@@ -26,12 +30,14 @@ def process_message(username, special):
                         user = User(username, REDDIT_INTERFACE)
                         user.process_comments()
                         comment_statistics = user.get_comment_statistics()
-                        print("comment statistics successfully retrieved")
+                        print("comment statistics successfuly retrieved")
                         return comment_statistics
                 except: 
-                        print("remeber to log error that comment failed")
+                        print("remember to log error that comment failed")
+                        return "I'm a bot that just gets simple statistics about your comment history. Don't hurt me."
         print("Username is none")       
         return None
+
 
 def reply(message, reply_object):
         if not (reply_object is None):
@@ -46,6 +52,7 @@ def launch_response(message):
     username, special = parse_comment_text(message.body)
     reply_object = process_message(username, special)
     reply(message, reply_object)
+    print("MARK READ")
     message.mark_as_read()
 
 def main():

@@ -40,40 +40,41 @@ class User:
         def insert_submitted(self, submitted):
                 (self.submitted).insert(submitted)
         
-        ## 
         def get_comments_by_subreddit(self, subreddit):
                 return (self.comments).get_subreddit_posts(subreddit)
 
         def get_submitted_by_subreddit(self, subreddit):
                 return (self.submitted).get_subreddit_posts(subreddit)
 
+        # get all commenets from the user
         def process_comments(self):
                 comment_iter = (self.user).get_comments(limit=None)
                 for comment in comment_iter:
                         (self.comments).insert(comment)
 
+        # get all submissions from the user
         def process_submitted(self):
                 submitted_iter = (self.user).get_submitted(limit=None)
                 for submitted in submitted_iter:
                         (self.submitted).insert(submitted)
 
-
+        # get a string of all of the user's comment statistics
         def get_comment_statistics(self):
                 str_message = "Data for the last {} comments (MAX 1000)\n\n{:20}|{:20}|{:20}\n".format(
                         self.get_number_of_comments(), "Subreddit", "Posts" ,"Percentage")
                 str_message += (("-"*20 + "|")*2 + "-"*20)+"\n"
                 comment_dict = self.get_comments().get_posts()
-                local_c = 0
+                local_c = 0     #This is a counter to make sure no more than MAX_SUBS subreddits are accounted for
 
                 for subreddit in sorted(comment_dict, key=lambda k: len(comment_dict[k]), reverse=True): 
                         num_posts = len(comment_dict[subreddit])
                         percentage = "{0:.2f}%".format(100 * num_posts/self.get_number_of_comments())
-                        str_message += "{:20}|{:20}|{:20}\n".format(subreddit, num_posts, percentage)
+                        str_message += "/r/{:20}|{:20}|{:20}\n".format(subreddit, num_posts, percentage)
                         local_c+=1
                         if local_c == MAX_SUBS:
                             break
-
-                str_message+="\n\nWant to remove this post? Send a message with the link to this post to /u/fuck_these_bots."
+                
+                str_message += "\n\n To summon this bot, the first line of your comment should be: /u/user_history_bot USERNAME"
                 return str_message
 
 
