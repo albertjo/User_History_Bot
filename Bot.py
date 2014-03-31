@@ -10,9 +10,6 @@ REDDIT_USERNAME = config['reddit_username']
 REDDIT_PASSWORD = config['reddit_password']
 BAN_MESSAGE = "User_History_Bot has been banned from this subreddit"
 
-RANDOM_MESSAGE_1 = config['random_message_1']
-RANDOM_MESSAGE_2 = config['random_message_2']
-
 #
 def parse_comment_text(text):
         string_list = text.split()
