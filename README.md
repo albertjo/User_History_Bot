@@ -1,9 +1,10 @@
 User History Bot
 ================
 *UPDATE*
+I took this app down after it kept incurring me $4.20 each month on Heroku.
 
 
-Retrieve basic statistics from a Reddit user's comment history.
+Retrieve fun statistics from a Reddit user's comment history.
 Do whatever you like with it but please try not be too creepy.
 
 
