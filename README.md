@@ -1,6 +1,6 @@
 User History Bot
 ================
-
+*UPDATE*
 Retrieve basic statistics from a Reddit user's comment history.
 Do whatever you like with it but please try not be too creepy.
 
