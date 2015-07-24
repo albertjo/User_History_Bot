@@ -1,9 +1,8 @@
 import praw
 import time
 import re
-from reddit_classes import User
 from config import config
-from random import randrange
+
 
 REDDIT_INTERFACE = None
 USER_AGENT = config['user_agent'] 
@@ -29,7 +28,7 @@ def get_comment_history(user):
     subreddit_count = dict((subreddit, subreddits.count(subreddit)) for subreddit in subreddits)
     for subreddit in sorted(subreddit_count, key=lambda k:subreddit_count[k],reverse=True):
         count = subreddit_count[subreddit]
-        percentage = "{0:.2f}%".format(100*count/len(subreddits))
+        percentage = "{0:.2f}%".format(100.0*count/len(subreddits))
         str_message += "/r/{:20}|{:20}|{:20}\n".format(subreddit, count , percentage)
     str_message += "\n\n To summon this bot, the first line of your comment should be: /u/{} @USERNAME".format(REDDIT_USERNAME)
     return str_message
@@ -40,14 +39,14 @@ def generate_response(username):
     if does_user_exist(user):
         return get_comment_history(user) 
     else:
-        return '{} is an invalid user! '.format(username)
+        return '{} is an invalid user!'.format(username)
 
 
 def respond(msg_to_respond, response):
     try:
         msg_to_respond.reply(response)
     except:
-        REDDIT_INTERFACE.send(msg_to_respond.author,
+        REDDIT_INTERFACE.send_message(msg_to_respond.author,
                 subject=BAN_MESSAGE, message=response)
     
 
