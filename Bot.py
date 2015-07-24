@@ -1,5 +1,6 @@
 import praw
 import time
+import re
 from reddit_classes import User
 from config import config
 from random import randrange
@@ -10,69 +11,73 @@ REDDIT_USERNAME = config['reddit_username']
 REDDIT_PASSWORD = config['reddit_password']
 BAN_MESSAGE = "User_History_Bot has been banned from this subreddit"
 
-#
-def parse_comment_text(text):
-        string_list = text.split()
-        username, special = None, None
-        if len(string_list) > 1:
-                if (((string_list[0]).lower()).strip() == "/u/user_history_bot"):
-                        username = (string_list[1]).strip()
-                        if len(string_list) > 2:
-                                special = string_list[2]
-        return username, special
 
-def process_message(username, special):
-        if not (username is None):
-                try: 
-                        user = User(username, REDDIT_INTERFACE)
-                        user.process_comments()
-                        comment_statistics = user.get_comment_statistics()
-                        print("comment statistics successfuly retrieved")
-                        return comment_statistics
-                except: 
-                        print("remember to log error that comment failed")
-                        return "I'm a bot that just gets simple statistics about your comment history. Don't hurt me."
-        print("Username is none")       
-        return None
+def does_user_exist(user):
+    try:
+        for comment in user.get_comments(limit=1):
+            pass
+        return True
+    except praw.errors.NotFound:
+        return False
 
 
-def reply(message, reply_object):
-        if not (reply_object is None):
-                try:
-                    message.reply(reply_object)
-                except:
-                    REDDIT_INTERFACE.send_message(message.author, 
-                            subject= BAN_MESSAGE, message = reply_object)
+def get_comment_history(user):
+    subreddits = [str(comment.subreddit.display_name) for comment in user.get_comments(limit=None)]
+    str_message = "Data for the last {} comments for /u/{} (MAX 1000)\n\n{:20}|{:20}|{:20}\n".format(len(subreddits),str(user),
+            "Subreddit","Posts","Percentage")
+    str_message += (("-"*20 + "|")*2 + "-"*20)+"\n"
+    subreddit_count = dict((subreddit, subreddits.count(subreddit)) for subreddit in subreddits)
+    for subreddit in sorted(subreddit_count, key=lambda k:subreddit_count[k],reverse=True):
+        count = subreddit_count[subreddit]
+        percentage = "{0:.2f}%".format(100*count/len(subreddits))
+        str_message += "/r/{:20}|{:20}|{:20}\n".format(subreddit, count , percentage)
+    str_message += "\n\n To summon this bot, the first line of your comment should be: /u/{} @USERNAME".format(REDDIT_USERNAME)
+    return str_message
 
-# parse a message string and do appropriate
-def launch_response(message):
-    username, special = parse_comment_text(message.body)
-    reply_object = process_message(username, special)
-    reply(message, reply_object)
-    print("MARK READ")
-    message.mark_as_read()
+
+def generate_response(username):
+    user = REDDIT_INTERFACE.get_redditor(username )
+    if does_user_exist(user):
+        return get_comment_history(user) 
+    else:
+        return '{} is an invalid user! '.format(username)
+
+
+def respond(msg_to_respond, response):
+    try:
+        msg_to_respond.reply(response)
+    except:
+        REDDIT_INTERFACE.send(msg_to_respond.author,
+                subject=BAN_MESSAGE, message=response)
+    
+
+def run_bot():
+    unread_messages = REDDIT_INTERFACE.get_unread()
+    for message in unread_messages:
+        print message 
+        str_message = str(message).lower()
+        if re.match("/u/{} @\w+".format(REDDIT_USERNAME.lower()), str_message):
+            usernames = [m[2:] for m in re.findall(' @\w+', str_message)]
+            for username in usernames:
+                response = generate_response(username)
+                respond(message, response)
+        print 'success'
+        message.mark_as_read()
+
 
 def main():
-        running = True
-        while (running):
-                try:
-                        unread_messages = REDDIT_INTERFACE.get_unread()
-                        for message in unread_messages:
-                                launch_response(message)
-                except KeyboardInterrupt:
-                        running = False
-                time.sleep(10)
+    running = True
+    while (running):
+        run_bot()       
+        time.sleep(10)
 
 
 if __name__ == '__main__':
-        try:
-                REDDIT_INTERFACE = praw.Reddit(user_agent = USER_AGENT)
-                REDDIT_INTERFACE.login(REDDIT_USERNAME, REDDIT_PASSWORD) 
-        except praw.errors.InvalidUser:
-                print("remember to log error that user is invalid")     
-        except praw.errors.InvalidUserPass:
-                print("remember to log error that password is invalid")
-        except:
-                print()
-        else:
-                main()
+    try:
+        REDDIT_INTERFACE = praw.Reddit(user_agent = USER_AGENT)
+        REDDIT_INTERFACE.login(REDDIT_USERNAME, REDDIT_PASSWORD) 
+    except praw.errors.InvalidUser:
+        print("remember to log error that user is invalid")     
+    except praw.errors.InvalidUserPass:
+        print("remember to log error that password is invalid")
+    main()
