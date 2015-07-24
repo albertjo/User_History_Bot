@@ -1,7 +1,7 @@
 config = {
 
-	'user-agent' = "",
-	'reddit_username' = "",
-	'reddit_password'=""
+	'user-agent' = "",		# enter something
+	'reddit_username' = "",		# enter username
+	'reddit_password'=""		# enter password
 
 }
