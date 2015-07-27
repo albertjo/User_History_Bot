@@ -2,7 +2,7 @@ User History Bot
 ================
 
 Retrieve fun statistics from a Reddit user's comment history.
-Do whatever you like with it but please try not be too creepy.
+Do whatever you like with it.
 
 
 ![](http://i.imgur.com/cDXHx1d.png)
